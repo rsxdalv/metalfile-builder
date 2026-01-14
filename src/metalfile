@@ -2,7 +2,7 @@
 # Metalfile Builder Tool
 # Usage: metalfile build <manifest.yml>
 
-set -e
+set -euo pipefail
 
 COMMAND=$1
 MANIFEST=$2
@@ -23,11 +23,11 @@ cd "$MANIFEST_DIR" || exit 1
 MANIFEST=$(basename "$MANIFEST")
 
 # Read package info
-PKG_NAME=$(yq '.package.name' "$MANIFEST")
-PKG_VERSION=$(yq '.package.version' "$MANIFEST")
-PKG_ARCH=$(yq '.package.architecture' "$MANIFEST")
-PKG_DEPENDS=$(yq '.package.depends | join(", ")' "$MANIFEST")
-PKG_DESC=$(yq '.package.description' "$MANIFEST")
+PKG_NAME=$(yq -r '.package.name' "$MANIFEST")
+PKG_VERSION=$(yq -r '.package.version' "$MANIFEST")
+PKG_ARCH=$(yq -r '.package.architecture' "$MANIFEST")
+PKG_DEPENDS=$(yq -r '.package.depends | join(", ")' "$MANIFEST")
+PKG_DESC=$(yq -r '.package.description' "$MANIFEST")
 
 # Create deb structure
 DEB_DIR="${PKG_NAME}-deb"
@@ -48,15 +48,16 @@ EOF
 
 # Maintainer scripts
 for script in postinst prerm postrm; do
-  if yq -e ".$script" "$MANIFEST" > /dev/null 2>&1; then
+  SCRIPT_CONTENT=$(yq -r --exit-status ".$script" "$MANIFEST" 2>/dev/null || true)
+  if [ -n "$SCRIPT_CONTENT" ] && [ "$SCRIPT_CONTENT" != "null" ]; then
     echo '#!/bin/bash' > "$DEB_DIR/DEBIAN/$script"
-    yq ".$script" "$MANIFEST" >> "$DEB_DIR/DEBIAN/$script"
+    printf '%s\n' "$SCRIPT_CONTENT" >> "$DEB_DIR/DEBIAN/$script"
     chmod +x "$DEB_DIR/DEBIAN/$script"
   fi
 done
 
 # Copy files
-yq '.files[] | .src + " " + .dest' "$MANIFEST" | while read -r src dest; do
+yq -r '.files[] | "\(.src) \(.dest)"' "$MANIFEST" | while read -r src dest; do
   mkdir -p "$(dirname "$DEB_DIR$dest")"
   cp "$src" "$DEB_DIR$dest"
 done

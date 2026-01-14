@@ -1,2 +1,1 @@
-#!/bin/bash
 echo "Metalfile installed. Usage: metalfile build <manifest.yml>"

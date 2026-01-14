@@ -1,6 +1,10 @@
 # Build artifacts
 *.deb
 *-deb/
+dist/
+deb-build/
+tests/**/hello-deb/
+tests/**/hello-deb.deb
 
 # Temporary files
 *.tmp

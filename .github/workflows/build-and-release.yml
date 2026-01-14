@@ -1,0 +1,33 @@
+name: Build and Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y yq dpkg-dev
+
+    - name: Smoke test
+      run: bash tests/smoke.sh
+
+    - name: Build package
+      run: |
+        chmod +x build.sh
+        ./build.sh
+
+    - name: Upload release asset
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*.deb
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

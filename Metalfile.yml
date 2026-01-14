@@ -6,7 +6,7 @@ package:
   description: Tool to build Debian packages from Metalfile YAML manifests
 
 files:
-  - src: src/metalfile
+  - src: ./src/metalfile
     dest: /usr/bin/metalfile
 
 postinst: |

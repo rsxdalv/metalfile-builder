@@ -1,6 +1,0 @@
-#!/bin/bash
-systemctl enable myapp
-systemctl start myapp
-ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/
-systemctl reload nginx
-

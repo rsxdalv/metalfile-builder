@@ -8,7 +8,7 @@ Build and install the tool:
 
 ```bash
 ./build.sh
-sudo dpkg -i metalfile-deb.deb
+sudo dpkg -i dist/metalfile_1.0_all.deb
 ```
 
 ## Usage
@@ -39,6 +39,14 @@ metalfile build Metalfile.yml
 ```
 
 This creates `myapp-1.0.deb`.
+
+## Testing
+
+Run a quick smoke test that builds a sample hello package and validates the contents:
+
+```bash
+bash tests/smoke.sh
+```
 
 ## Features
 

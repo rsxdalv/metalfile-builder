@@ -1,0 +1,13 @@
+package:
+  name: hello
+  version: 1.0
+  architecture: all
+  depends: [bash]
+  description: Simple hello app for smoke testing metalfile
+
+files:
+  - src: ./hello.sh
+    dest: /opt/hello/hello.sh
+
+postinst: |
+  echo "hello installed"
