@@ -1,0 +1,49 @@
+name: "Metalfile Debian Builder"
+description: "Build a Debian package from a Metalfile manifest and write it to dist/*.deb"
+author: "Metalfile"
+branding:
+  icon: "package"
+  color: "blue"
+
+inputs:
+  manifest:
+    description: "Path to the Metalfile manifest to build"
+    required: false
+    default: "Metalfile.yml"
+  working-directory:
+    description: "Directory to run the build from"
+    required: false
+    default: "."
+
+outputs:
+  package-path:
+    description: "Path to the built .deb package"
+    value: ${{ steps.export.outputs.package-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y yq dpkg-dev
+
+    - name: Build package
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        bash "${{ github.action_path }}/build.sh" "${{ inputs.manifest }}"
+
+    - id: export
+      name: Export package path
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        manifest_dir=$(cd "$(dirname "${{ inputs.manifest }}")" && pwd)
+        package_path=$(find "$manifest_dir/dist" -maxdepth 1 -type f -name '*.deb' | head -n 1)
+        if [ -z "$package_path" ]; then
+          echo "No .deb package found under $manifest_dir/dist" >&2
+          exit 1
+        fi
+        echo "package-path=$package_path" >> "$GITHUB_OUTPUT"

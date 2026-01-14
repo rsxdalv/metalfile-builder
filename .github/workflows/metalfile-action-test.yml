@@ -1,0 +1,25 @@
+name: Metalfile Action Test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-with-action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build package using local action
+        uses: ./
+        with:
+          manifest: Metalfile.yml
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: metalfile-package
+          path: dist/*.deb

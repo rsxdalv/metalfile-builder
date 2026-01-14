@@ -40,6 +40,30 @@ metalfile build Metalfile.yml
 
 This creates `myapp-1.0.deb`.
 
+## GitHub Action
+
+Build a Debian package in CI using the bundled GitHub Action:
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Debian package from Metalfile
+        uses: rsxdalv/metalfile-builder@v0.0.2
+        with:
+          manifest: Metalfile.yml # defaults to Metalfile.yml in the repo root
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb-package
+          path: dist/*.deb
+```
+
+Outputs
+
+- `package-path`: Full path to the built `.deb` file.
+
 ## Testing
 
 Run a quick smoke test that builds a sample hello package and validates the contents:
