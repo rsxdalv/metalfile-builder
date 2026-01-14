@@ -1,0 +1,8 @@
+Package: metalfile
+Version: 1.0
+Section: misc
+Priority: optional
+Architecture: all
+Depends: yq
+Maintainer: Your Name <your@email.com>
+Description: Tool to build Debian packages from Metalfile YAML manifests

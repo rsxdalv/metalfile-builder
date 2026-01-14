@@ -1,0 +1,13 @@
+package:
+  name: metalfile
+  version: 1.0
+  architecture: all
+  depends: [yq]
+  description: Tool to build Debian packages from Metalfile YAML manifests
+
+files:
+  - src: src/metalfile
+    dest: /usr/bin/metalfile
+
+postinst: |
+  echo "Metalfile installed. Usage: metalfile build <manifest.yml>"

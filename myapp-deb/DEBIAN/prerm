@@ -1,0 +1,4 @@
+#!/bin/bash
+systemctl stop myapp
+systemctl disable myapp
+

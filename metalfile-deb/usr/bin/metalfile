@@ -1,0 +1,67 @@
+#!/bin/bash
+# Metalfile Builder Tool
+# Usage: metalfile build <manifest.yml>
+
+set -e
+
+COMMAND=$1
+MANIFEST=$2
+
+if [ "$COMMAND" != "build" ] || [ -z "$MANIFEST" ]; then
+  echo "Usage: metalfile build <manifest.yml>"
+  exit 1
+fi
+
+if ! command -v yq &> /dev/null; then
+  echo "yq is required. Install with: sudo apt install yq"
+  exit 1
+fi
+
+# Change to manifest directory
+MANIFEST_DIR=$(dirname "$MANIFEST")
+cd "$MANIFEST_DIR" || exit 1
+MANIFEST=$(basename "$MANIFEST")
+
+# Read package info
+PKG_NAME=$(yq '.package.name' "$MANIFEST")
+PKG_VERSION=$(yq '.package.version' "$MANIFEST")
+PKG_ARCH=$(yq '.package.architecture' "$MANIFEST")
+PKG_DEPENDS=$(yq '.package.depends | join(", ")' "$MANIFEST")
+PKG_DESC=$(yq '.package.description' "$MANIFEST")
+
+# Create deb structure
+DEB_DIR="${PKG_NAME}-deb"
+rm -rf "$DEB_DIR"
+mkdir -p "$DEB_DIR/DEBIAN"
+
+# Control file
+cat > "$DEB_DIR/DEBIAN/control" <<EOF
+Package: $PKG_NAME
+Version: $PKG_VERSION
+Section: misc
+Priority: optional
+Architecture: $PKG_ARCH
+Depends: $PKG_DEPENDS
+Maintainer: Metalfile Builder <builder@metalfile.org>
+Description: $PKG_DESC
+EOF
+
+# Maintainer scripts
+for script in postinst prerm postrm; do
+  if yq -e ".$script" "$MANIFEST" > /dev/null 2>&1; then
+    echo '#!/bin/bash' > "$DEB_DIR/DEBIAN/$script"
+    yq ".$script" "$MANIFEST" >> "$DEB_DIR/DEBIAN/$script"
+    chmod +x "$DEB_DIR/DEBIAN/$script"
+  fi
+done
+
+# Copy files
+yq '.files[] | .src + " " + .dest' "$MANIFEST" | while read -r src dest; do
+  mkdir -p "$(dirname "$DEB_DIR$dest")"
+  cp "$src" "$DEB_DIR$dest"
+done
+
+# Build deb
+dpkg-deb --build "$DEB_DIR"
+
+echo "Built ${PKG_NAME}-${PKG_VERSION}.deb from $MANIFEST"

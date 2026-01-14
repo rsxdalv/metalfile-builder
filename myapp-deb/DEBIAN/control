@@ -1,0 +1,8 @@
+Package: myapp
+Version: 1.0
+Section: misc
+Priority: optional
+Architecture: all
+Depends: nodejs, nginx
+Maintainer: Metalfile Builder <builder@metalfile.org>
+Description: Sample Node.js app with systemd and nginx config
