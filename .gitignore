@@ -1,0 +1,6 @@
+# Build artifacts
+*.deb
+*-deb/
+
+# Temporary files
+*.tmp
