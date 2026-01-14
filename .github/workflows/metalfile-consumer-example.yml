@@ -1,0 +1,25 @@
+name: Metalfile Consumer Example
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-metalfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Debian package via released action
+        uses: rsxdalv/metalfile-builder@v0.0.3
+        with:
+          manifest: Metalfile.yml # defaults to Metalfile.yml in repo root
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: metalfile-deb
+          path: dist/*.deb
