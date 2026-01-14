@@ -8,3 +8,5 @@ tests/**/hello-deb.deb
 
 # Temporary files
 *.tmp
+
+template-repo
