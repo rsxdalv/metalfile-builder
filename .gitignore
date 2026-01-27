@@ -10,3 +10,5 @@ tests/**/hello-deb.deb
 *.tmp
 
 template-repo
+
+node_modules/
