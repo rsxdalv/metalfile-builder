@@ -213,6 +213,47 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  'get_github_action_info',
+  {
+    description: 'Returns usage instructions and YAML for the metalfile-builder GitHub Action.',
+    inputSchema: {}
+  },
+  async () => {
+    const info = [
+      'Use the metalfile-builder GitHub Action to build a Debian package in CI.',
+      '',
+      'Action: rsxdalv/metalfile-builder@v0.0.2',
+      '',
+      'Inputs:',
+      '  manifest  - Path to the Metalfile (default: Metalfile.yml)',
+      '',
+      'Outputs:',
+      '  package-path  - Full path to the built .deb file',
+      '',
+      'Example workflow:',
+      '',
+      '```yaml',
+      'jobs:',
+      '  build:',
+      '    runs-on: ubuntu-latest',
+      '    steps:',
+      '      - uses: actions/checkout@v4',
+      '      - name: Build Debian package from Metalfile',
+      '        uses: rsxdalv/metalfile-builder@v0.0.2',
+      '        with:',
+      '          manifest: Metalfile.yml # defaults to Metalfile.yml in the repo root',
+      '      - uses: actions/upload-artifact@v4',
+      '        with:',
+      '          name: deb-package',
+      '          path: dist/*.deb',
+      '```'
+    ].join('\n');
+
+    return { content: [{ type: 'text', text: info }] };
+  }
+);
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
