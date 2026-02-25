@@ -1,6 +1,6 @@
 {
   "name": "metalfile-mcp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "bin": {
     "metalfile-mcp": "src/index.ts"

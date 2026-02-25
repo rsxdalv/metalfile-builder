@@ -9,7 +9,7 @@ import { z, ZodError } from 'zod';
 
 const server = new McpServer({
   name: 'metalfile-mcp',
-  version: '0.1.0'
+  version: '1.0.0'
 });
 
 const metalfileSchema = z
@@ -223,7 +223,7 @@ server.registerTool(
     const info = [
       'Use the metalfile-builder GitHub Action to build a Debian package in CI.',
       '',
-      'Action: rsxdalv/metalfile-builder@v0.0.2',
+      'Action: rsxdalv/metalfile-builder@v1',
       '',
       'Inputs:',
       '  manifest  - Path to the Metalfile (default: Metalfile.yml)',
@@ -240,7 +240,7 @@ server.registerTool(
       '    steps:',
       '      - uses: actions/checkout@v4',
       '      - name: Build Debian package from Metalfile',
-      '        uses: rsxdalv/metalfile-builder@v0.0.2',
+      '        uses: rsxdalv/metalfile-builder@v1',
       '        with:',
       '          manifest: Metalfile.yml # defaults to Metalfile.yml in the repo root',
       '      - uses: actions/upload-artifact@v4',
