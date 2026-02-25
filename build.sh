@@ -48,7 +48,7 @@ done
 
 yq -r '.files[] | "\(.src) \(.dest)"' "$MANIFEST_FILE" | while read -r src dest; do
   mkdir -p "$(dirname "$STAGE$dest")"
-  cp "$MANIFEST_DIR/$src" "$STAGE$dest"
+  cp -r "$MANIFEST_DIR/$src" "$STAGE$dest"
 done
 
 OUTPUT="$MANIFEST_DIR/dist/${PKG_NAME}_${PKG_VERSION}_${PKG_ARCH}.deb"
