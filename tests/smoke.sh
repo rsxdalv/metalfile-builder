@@ -14,6 +14,11 @@ chmod +x "$APP_DIR/hello.sh"
 test -f "$DEB_FILE"
 dpkg-deb -f "$DEB_FILE" Package | grep -qx 'hello'
 dpkg-deb -c "$DEB_FILE" | grep -q '/opt/hello/hello.sh'
+dpkg-deb -c "$DEB_FILE" | grep -q '/etc/hello/config.json'
+
+# Verify DEBIAN/conffiles lists the config path
+dpkg-deb -e "$DEB_FILE" "$DEB_DIR/DEBIAN"
+grep -qx '/etc/hello/config.json' "$DEB_DIR/DEBIAN/conffiles"
 
 TMP_DIR="$(mktemp -d)"
 dpkg-deb -x "$DEB_FILE" "$TMP_DIR"

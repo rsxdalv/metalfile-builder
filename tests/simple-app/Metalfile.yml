@@ -8,6 +8,11 @@ package:
 files:
   - src: ./hello.sh
     dest: /opt/hello/hello.sh
+  - src: ./config.json
+    dest: /etc/hello/config.json
+
+conffiles:
+  - /etc/hello/config.json
 
 postinst: |
   echo "hello installed"
