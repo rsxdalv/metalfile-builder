@@ -33,6 +33,7 @@ const metalfileSchema = z
           .passthrough()
       )
       .nonempty('files must contain at least one entry'),
+    conffiles: z.array(z.string().min(1)).optional(),
     postinst: z.string().optional()
   })
   .passthrough();
@@ -50,6 +51,7 @@ const writeInputSchema = z
     overwrite: z.boolean().default(true),
     package: metalfileSchema.shape.package,
     files: metalfileSchema.shape.files,
+    conffiles: z.array(z.string().min(1)).optional(),
     postinst: z.string().optional()
   })
   .passthrough();
@@ -112,13 +114,22 @@ server.registerTool(
 
     const pkg = validation.data.package;
     const filesCount = validation.data.files.length;
+    const conffilesCount = validation.data.conffiles?.length ?? 0;
     const sourceLabel = content ? 'provided content' : fullPath;
+
+    const summary = [
+      `Metalfile is valid.`,
+      `Source: ${sourceLabel}`,
+      `Package: ${pkg.name}@${pkg.version}`,
+      `Files entries: ${filesCount}`,
+      ...(conffilesCount > 0 ? [`Conffiles entries: ${conffilesCount}`] : [])
+    ].join('\n');
 
     return {
       content: [
         {
           type: 'text',
-          text: `Metalfile is valid.\nSource: ${sourceLabel}\nPackage: ${pkg.name}@${pkg.version}\nFiles entries: ${filesCount}`
+          text: summary
         }
       ]
     };
@@ -183,7 +194,7 @@ server.registerTool(
   async () => {
     const hint = [
       'Use the write_metalfile tool to emit a Metalfile to disk.',
-      'Key fields: path (default Metalfile.yml), overwrite (default true), package (name, version, architecture, depends[], description), files[{src,dest}], optional postinst string.',
+      'Key fields: path (default Metalfile.yml), overwrite (default true), package (name, version, architecture, depends[], description), files[{src,dest}], optional conffiles[] (absolute dest paths for dpkg to preserve on upgrade), optional postinst string.',
       'Paths are resolved relative to the server working directory.',
       'Example payload:',
       JSON.stringify(
@@ -199,7 +210,11 @@ server.registerTool(
           },
           files: [
             { src: './app/app.js', dest: '/opt/example-app/app.js' },
-            { src: './app/package.json', dest: '/opt/example-app/package.json' }
+            { src: './app/package.json', dest: '/opt/example-app/package.json' },
+            { src: './config/config.json', dest: '/etc/example-app/config.json' }
+          ],
+          conffiles: [
+            '/etc/example-app/config.json'
           ],
           postinst: '#!/bin/bash\necho "postinst hook"'
         },

@@ -62,6 +62,11 @@ yq -r '.files[] | "\(.src) \(.dest)"' "$MANIFEST" | while read -r src dest; do
   cp "$src" "$DEB_DIR$dest"
 done
 
+# Conffiles (preserve user-edited config files across upgrades)
+if yq -e '.conffiles' "$MANIFEST" &>/dev/null 2>&1; then
+  yq -r '.conffiles[]' "$MANIFEST" > "$DEB_DIR/DEBIAN/conffiles"
+fi
+
 # Build deb
 dpkg-deb --build "$DEB_DIR"
 
